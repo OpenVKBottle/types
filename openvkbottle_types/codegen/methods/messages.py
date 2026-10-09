@@ -653,9 +653,6 @@ class MessagesCategory(BaseCategory):
         response = await self.api.request("messages.getHistoryAttachments", params)
         model = MessagesGetHistoryAttachmentsResponse
 
-        print("\n=== HISTORY ATTACHMENTS RAW ===")
-        print(response)
-
         return model(**response).response
 
     @typing.overload

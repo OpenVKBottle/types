@@ -12,29 +12,25 @@ license-files = ["LICENSE"]
 readme = "README.md"
 
 authors = [
-{ name = "timoniq" },
-{ name = "feeeek" },
-{ name = "luwqz1" },
-{ name = "cynexeso" },
+    { name = "cynexeso", email = "cynexeso@gmail.ru" }
 ]
-
 maintainers = [
-    { name = "cynexeso", email = "cynexeso@gmail.com" },
+    { name = "cynexeso", email = "cynexeso@gmail.ru" }
 ]
 
 dependencies = [
 "pydantic>=2.13.4,<3.0.0",
-"openvkbottle>=0.1.0,<0.2.0",
 "typing-extensions>=4.16.0,<5.0.0",
 "msgspec>=0.21.1,<0.22.0",
 ]
 
 keywords = [
 "openvk",
+"ovk",
 "openvkbottle",
-"vkbottle",
-"vk api",
-"vkontakte",
+"openvkbottle",
+"ovk api",
+"openvkontakte",
 "types",
 "api methods",
 "api objects",
@@ -54,9 +50,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cynexeso/openvkbottle-types"
-Repository = "https://github.com/cynexeso/openvkbottle-types"
-Issues = "https://github.com/cynexeso/openvkbottle/issues"
+Homepage = "https://github.com/openvkbottle/types"
+Repository = "https://github.com/openvkbottle/types"
+Issues = "https://github.com/openvkbottle/openvkbottle/issues"
 "Original project" = "https://github.com/vkbottle/types"
 
 [dependency-groups]
