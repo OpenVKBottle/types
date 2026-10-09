@@ -1,0 +1,56 @@
+from openvkbottle_types.base_model import BaseModel, Field
+from openvkbottle_types.objects import AppWidgetsPhoto, AppWidgetsPhotos
+from openvkbottle_types.responses.base_response import BaseResponse
+
+
+class AppWidgetsGetAppImageUploadServerResponseModel(BaseModel):
+    upload_url: str | None = Field(
+        default=None,
+    )
+
+
+class AppWidgetsGetAppImageUploadServerResponse(BaseResponse):
+    response: "AppWidgetsGetAppImageUploadServerResponseModel" = Field()
+
+
+class AppWidgetsGetAppImagesResponse(BaseResponse):
+    response: "AppWidgetsPhotos" = Field()
+
+
+class AppWidgetsGetGroupImageUploadServerResponseModel(BaseModel):
+    upload_url: str | None = Field(
+        default=None,
+    )
+
+
+class AppWidgetsGetGroupImageUploadServerResponse(BaseResponse):
+    response: "AppWidgetsGetGroupImageUploadServerResponseModel" = Field()
+
+
+class AppWidgetsGetGroupImagesResponse(BaseResponse):
+    response: "AppWidgetsPhotos" = Field()
+
+
+class AppWidgetsGetImagesByIdResponse(BaseResponse):
+    response: list["AppWidgetsPhoto"] = Field()
+
+
+class AppWidgetsSaveAppImageResponse(BaseResponse):
+    response: "AppWidgetsPhoto" = Field()
+
+
+class AppWidgetsSaveGroupImageResponse(BaseResponse):
+    response: "AppWidgetsPhoto" = Field()
+
+
+__all__ = (
+    "AppWidgetsGetAppImageUploadServerResponse",
+    "AppWidgetsGetAppImageUploadServerResponseModel",
+    "AppWidgetsGetAppImagesResponse",
+    "AppWidgetsGetGroupImageUploadServerResponse",
+    "AppWidgetsGetGroupImageUploadServerResponseModel",
+    "AppWidgetsGetGroupImagesResponse",
+    "AppWidgetsGetImagesByIdResponse",
+    "AppWidgetsSaveAppImageResponse",
+    "AppWidgetsSaveGroupImageResponse",
+)

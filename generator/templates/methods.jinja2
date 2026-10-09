@@ -1,0 +1,62 @@
+import typing
+
+from openvkbottle_types.methods.base_category import BaseCategory
+from openvkbottle_types.objects import *
+from openvkbottle_types.responses.{{snake_case(category.name)}} import *  # noqa: F401,F403  # type: ignore
+from openvkbottle_types.responses.base import (
+    BaseOkResponse,
+    BaseOkResponseModel,
+    BaseBoolResponse,
+    BaseGetUploadServerResponse,
+    BaseUndefinedResponse,
+)
+from openvkbottle_types.responses.base_response import DictResponse
+
+class {{camelcase(category.name)}}Category(BaseCategory):
+    {% for method in category.methods %}
+    {% if not method.is_single_response %}
+
+    {% for dep_method in method.get_dependants() %}
+    @typing.overload
+    async def {{snake_case(method.name)}}(
+        self,
+        {% for parameter in dep_method.sorted_parameters %}
+        {{makesafe(parameter.name)}}: {% if parameter.required == False %}{% endif %}{{parameter.get_type()}}{% if parameter.required == False %} | None{% endif %}{% if parameter.has_default %} = {{ parameter.get_default() }} {% endif %},
+        {% endfor %}
+        **kwargs: typing.Any,
+    ) -> {{dep_method.get_response_hint()}}:
+        ...
+    {% endfor %}
+    {% endif %}
+
+    async def {{makesafe_method_name(snake_case(method.name))}}(
+        self,
+        {% for parameter in method.sorted_parameters %}
+        {{makesafe(parameter.name)}}: {% if parameter.required == False %}{% endif %}{{parameter.get_type()}}{% if parameter.required == False %} | None{% endif %}{% if parameter.has_default %} = {{ parameter.get_default() }} {% endif %},
+        {% endfor %}
+        **kwargs: typing.Any,
+    ) -> {{method.get_response_hint()}}:
+        """Method `{{category.name}}.{{method.name}}()`
+        {{method.description}}{% for parameter in method.sorted_parameters %}
+        :param {{parameter.name}}: {{parameter.description or ''}}{% endfor %}
+        """
+
+        params = self.get_set_params(locals())
+        response = await self.api.request("{{category.name + "." + method.name}}", params)
+        {% if method.is_single_response %}model = {{method.get_response_model()}}
+        {% else %}model = self.get_model(
+            (
+                {% for param, response_model in method.get_dependants_dependant_parameters().items() %}
+                (("{{param}}",), {{response_model}}),
+                {% endfor %}
+            ),
+            default={{method.get_response_model()}},
+            params=params,
+        )
+        {% endif %}return model(**response).response
+    {% endfor %}
+
+
+__all__ = (
+    "{{camelcase(category.name)}}Category",
+)

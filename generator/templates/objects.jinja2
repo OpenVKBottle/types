@@ -1,0 +1,61 @@
+import datetime
+
+import typing_extensions as typing
+
+from openvkbottle_types.base_model import BaseModel, Field, BaseEnumMeta, StrEnum, IntEnum
+
+
+{% for name, definition in definitions.items() %}
+
+{% if definition.enum %}
+{% if is_int(definition.enum[0]) %}
+class {{camelcase(name)}}(IntEnum, metaclass=BaseEnumMeta):
+    {% for enumeration in definition.enum %}{{makesafe(definition.enumNames[loop.index-1])|upper}} = {{enumeration}}
+    {% endfor %}
+{% else %}
+class {{camelcase(name)}}(StrEnum, metaclass=BaseEnumMeta):
+    {% for enumeration in definition.enum %}{{makesafe(enumeration|upper)}} = "{{enumeration}}"
+    {% endfor %}
+{% endif %}
+{% else %}
+
+{% for enum_defin in definition.get_enums(name) %}
+class {{enum_defin.name}}(StrEnum, metaclass=BaseEnumMeta):
+    {% for enumeration in enum_defin.enum %}{{makesafe(enumeration|upper)}} = "{{enumeration}}"
+    {% endfor %}
+{% endfor %}
+
+{% if definition.is_typealias %}
+{{camelcase(name)}}: typing.TypeAlias = {{definition.typealias_value}}
+{% else %}
+class {{camelcase(name)}}({{", ".join(definition.get_bases())}}):
+    """{% if definition.description %}
+    {{definition.description}}{% endif %}
+    Model: `{{camelcase(name)}}`
+    """
+    {% for property in definition.get_properties() %}
+    {{makesafe(property.name)}}: {{property.get_type(hint=True, literal_to_enum=True, definition_name=name)}} = Field(
+        {% if property.is_optional %}
+        default=None,
+        {% endif %}
+        {% if makesafe(property.name) != property.name %}
+        alias="{{property.name}}",
+        {% endif %}
+    )
+    {% if property.description %}"""{{instring(property.description)}}."""
+    {% else %}"""Property `{{camelcase(name)}}.{{property.name}}`."""
+    {% endif %}
+    {% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
+
+
+__all__ = (
+    {% for name, definition in definitions.items() %}
+    "{{camelcase(name)}}",
+    {% for enum in definition.get_enums(name) %}
+    "{{enum.name}}",
+    {% endfor %}
+    {% endfor %}
+)
