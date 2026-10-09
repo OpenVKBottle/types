@@ -1,0 +1,70 @@
+from openvkbottle_types.base_model import BaseModel, Field
+from openvkbottle_types.objects import GroupsGroupsArray, UsersSubscriptionsItem, UsersUserFull, UsersUsersArray
+from openvkbottle_types.responses.base_response import BaseResponse
+
+
+class UsersGetFollowersFieldsResponseModel(BaseModel):
+    count: int = Field()
+    items: list["UsersUserFull"] = Field()
+    friends_count: int | None = Field(
+        default=None,
+    )
+
+
+class UsersGetFollowersFieldsResponse(BaseResponse):
+    response: "UsersGetFollowersFieldsResponseModel" = Field()
+
+
+class UsersGetFollowersResponseModel(BaseModel):
+    count: int = Field()
+    items: list[int] = Field()
+
+
+class UsersGetFollowersResponse(BaseResponse):
+    response: "UsersGetFollowersResponseModel" = Field()
+
+
+class UsersGetSubscriptionsExtendedResponseModel(BaseModel):
+    count: int = Field()
+    items: list["UsersSubscriptionsItem"] = Field()
+
+
+class UsersGetSubscriptionsExtendedResponse(BaseResponse):
+    response: "UsersGetSubscriptionsExtendedResponseModel" = Field()
+
+
+class UsersGetSubscriptionsResponseModel(BaseModel):
+    users: "UsersUsersArray" = Field()
+    groups: "GroupsGroupsArray" = Field()
+
+
+class UsersGetSubscriptionsResponse(BaseResponse):
+    response: "UsersGetSubscriptionsResponseModel" = Field()
+
+
+class UsersGetResponse(BaseResponse):
+    response: list["UsersUserFull"] = Field()
+
+
+class UsersSearchResponseModel(BaseModel):
+    count: int = Field()
+    items: list["UsersUserFull"] = Field()
+
+
+class UsersSearchResponse(BaseResponse):
+    response: "UsersSearchResponseModel" = Field()
+
+
+__all__ = (
+    "UsersGetFollowersFieldsResponse",
+    "UsersGetFollowersFieldsResponseModel",
+    "UsersGetFollowersResponse",
+    "UsersGetFollowersResponseModel",
+    "UsersGetResponse",
+    "UsersGetSubscriptionsExtendedResponse",
+    "UsersGetSubscriptionsExtendedResponseModel",
+    "UsersGetSubscriptionsResponse",
+    "UsersGetSubscriptionsResponseModel",
+    "UsersSearchResponse",
+    "UsersSearchResponseModel",
+)

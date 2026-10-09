@@ -1,0 +1,68 @@
+import datetime
+import typing
+
+from openvkbottle_types.base_model import BaseModel, Field, BaseEnumMeta, StrEnum, IntEnum
+from openvkbottle_types.responses.base_response import BaseResponse
+
+### IMPORTS
+
+{% for (name, definition) in definitions %}
+{% set response_def = definition.get_response_definition() %}
+
+{% if response_def is not none and response_def.type == 'enum' %}
+{% if is_int(response_def.enum[0]) %}
+class {{camelcase(name)}}Model(IntEnum, metaclass=BaseEnumMeta):
+    {% for enumeration in response_def.enum %}{{makesafe(response_def.enumNames[loop.index-1])|upper}} = {{enumeration}}
+    {% endfor %}
+{% else %}
+class {{camelcase(name)}}Model(StrEnum, metaclass=BaseEnumMeta):
+    {% for enumeration in response_def.enum %}{{makesafe(enumeration|upper)}} = "{{enumeration}}"
+    {% endfor %}
+{% endif %}
+{% endif %}
+
+{% if response_def is not none and response_def.type == 'object' and response_def.get_properties() %}
+class {{camelcase(name)}}Model({{", ".join(response_def.get_bases())}}):
+    {% for property in response_def.get_properties() %}
+    {{makesafe(property.name)}}: {{property.get_type(hint=True, literal_to_enum=True, definition_name=name)}} = Field(
+        {% if property.is_optional %}
+        default={{property.default if property.default is not none else None}},
+        {% elif property.required and property.default is not none %}
+        default={{property.default}}
+        {% endif %}
+        {% if makesafe(property.name) != property.name %}
+        alias="{{property.name}}",
+        {% endif %}
+    ){% endfor %}
+{% endif %}
+
+class {{camelcase(name)}}(BaseResponse):
+    {% for property in definition.get_properties() %}
+    {% if property.name == 'response' and response_def is not none and (response_def.enum or response_def.properties) %}
+    response: "{{camelcase(name)}}Model" = Field(
+        {% if property.required and property.default is not none %}
+        default={{property.get_default_value(model_name=camelcase(name) + 'Model')}}
+        {% endif %}
+    ){% elif property.name == 'response' and property.get_type(response=True) == 'dict' %}
+    response: dict[str, typing.Any] = Field(){% else %}
+    {{makesafe(property.name)}}: {{property.get_type(hint=True, literal_to_enum=True, definition_name=name, response=True)}} = Field(
+        {% if property.is_optional %}
+        default={{property.default if property.default is not none else None}},
+        {% elif property.required and property.default is not none %}
+        default={{property.default}}
+        {% endif %}
+        {% if makesafe(property.name) != property.name %}
+        alias="{{property.name}}",
+        {% endif %}
+    ){% endif %}
+    {% endfor %}
+{% endfor %}
+
+__all__ = (
+    {% for (name, definition) in definitions %}
+    {% set response_def = definition.get_response_definition() %}
+    {% if response_def is not none and (response_def.type == 'enum' or (response_def.type == 'object' and response_def.get_properties())) %}
+    "{{camelcase(name)}}Model",{% endif %}
+    "{{camelcase(name)}}",
+    {% endfor %}
+)
